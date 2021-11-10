@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -80,8 +81,19 @@ class MarkdownPage extends StatelessWidget {
         title: Text(toString()),
       ),
       body: SafeArea(
-        child: Markdown(
-          data: path,
+        child: FutureBuilder(
+          future: http
+              .get(
+                Uri.parse(
+                  'https://raw.githubusercontent.com/muhiro12/zenn-content/main/articles/$path',
+                ),
+              )
+              .then((value) => value.body),
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            return Markdown(
+              data: snapshot.data ?? '',
+            );
+          },
         ),
       ),
     );
